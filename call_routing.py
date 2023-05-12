@@ -15,6 +15,7 @@ def process_call(ext):
         phonesound.play_voicemail()
         while(phonesound.pygame.mixer.get_busy()):
             time.sleep(0.1)
+        phonesound.beep.play()
         vmrecord.start_recording_voicemail()
     return
     

@@ -67,6 +67,9 @@ key0s = pygame.mixer.Sound(os.path.join('sounds', 'DTMF-0.wav'))  #load sound
 keypounds = pygame.mixer.Sound(os.path.join('sounds', 'DTMF-pound.wav'))  #load sound
 dialtone = pygame.mixer.Sound(os.path.join('sounds', 'dialtone.wav'))
 voicemail = pygame.mixer.Sound(os.path.join('sounds', 'voicemail.wav'))
+beep = pygame.mixer.Sound(os.path.join('sounds', 'keytone4.wav'))
+
+dialtone.set_volume(0.3)
 
 key_tones = {
     "1": key1s,

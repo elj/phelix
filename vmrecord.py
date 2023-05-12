@@ -3,6 +3,7 @@
 
 import os
 import time
+import datetime
 import pyaudio
 import wave
     
@@ -12,8 +13,9 @@ chunk = 1024
 sample_format = pyaudio.paInt16
 channels = 2
 fs = 44100
-seconds = 10
-filename = "latestVM.wav"
+seconds = 30
+filename_base = "voicemail.wav"
+directory = "recordings"
 
 
 
@@ -25,9 +27,8 @@ vmStop = 0
 #                 frames_per_buffer=chunk,
 #                 input=True)
 
-frames = [] #empty set that will become audio data
-
 def start_recording_voicemail():
+    frames = []
     p = pyaudio.PyAudio()
     global vmStop
     print("vmStop=", vmStop)
@@ -48,6 +49,9 @@ def start_recording_voicemail():
     p.terminate()
 
     print("Done recording!")
+    
+    ct = datetime.datetime.now()
+    filename = os.path.join(directory, str(ct.year) + "-" + str(ct.month) + "-" + str(ct.day) + "-" + str(ct.hour) + "h" + str(ct.minute) + "m" + str(ct.second) + "_" + filename_base)
 
     wf = wave.open(filename, 'wb')
     wf.setnchannels(channels)
