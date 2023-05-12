@@ -18,7 +18,7 @@ gpio_hook = 19
 
 GPIO.setup(gpio_outputs, GPIO.OUT)
 GPIO.setup(gpio_inputs, GPIO.IN, pull_up_down=GPIO.PUD_DOWN) #use internal pull-down for detecting current
-GPIO.setup(gpio_hook, GPIO.IN)
+GPIO.setup(gpio_hook, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 
 line1 = ["#", "0", "*"]
 line2 = ["9", "8", "7"]
