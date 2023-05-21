@@ -43,7 +43,7 @@ def gpio_change_callback(channel):
 
 def phone_hook_callback(channel):
     #print("hook state changed")
-    if GPIO.input(channel):
+    if GPIO.input(channel) == 0:
         print("Phone ON hook")
         modes.set_mode_by_number(0)
         phonesound.process_hangup()
@@ -56,7 +56,7 @@ def phone_hook_callback(channel):
         vmrecord.reset_vmStop()
 
 
-GPIO.add_event_detect(gpio_hook, GPIO.BOTH, callback=phone_hook_callback, bouncetime=100)
+GPIO.add_event_detect(gpio_hook, GPIO.BOTH, callback=phone_hook_callback, bouncetime=1)
 
 # for i in gpio_inputs:  # for each GPIO input, call a function with the channel number
 #     GPIO.add_event_detect(i, GPIO.BOTH, callback=gpio_change_callback, bouncetime=10)

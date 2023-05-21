@@ -12,8 +12,8 @@ import wave
 chunk = 1024
 sample_format = pyaudio.paInt16
 channels = 2
-fs = 44100
-seconds = 30
+fs = 48000
+seconds = 10
 filename_base = "voicemail.wav"
 directory = "recordings"
 
@@ -43,7 +43,7 @@ def start_recording_voicemail():
         frames.append(data)
         if (vmStop == 1):
             break
-    vmvmStop = 0
+    vmStop = 0
     stream.stop_stream()
     stream.close()
     p.terminate()
