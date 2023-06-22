@@ -12,17 +12,17 @@ import vmrecord
 GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)
 
-gpio_outputs = [18, 23, 24, 25] #columns - send current out
-gpio_inputs = [16, 20, 21] #lines/rows - detect current back
-gpio_hook = 19
+gpio_outputs = [5, 6, 13, 19] #columns - send current out connector B
+gpio_inputs = [17, 27, 22] #lines/rows - detect current back connector A
+gpio_hook = 18
 
 GPIO.setup(gpio_outputs, GPIO.OUT)
 GPIO.setup(gpio_inputs, GPIO.IN, pull_up_down=GPIO.PUD_DOWN) #use internal pull-down for detecting current
 GPIO.setup(gpio_hook, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 
-line1 = ["#", "0", "*"]
+line1 = ["6", "5", "4"]
 line2 = ["9", "8", "7"]
-line3 = ["6", "5", "4"]
+line3 = ["#", "0", "*"]
 line4 = ["3", "2", "1"]
 
 lines = [line1, line2, line3, line4]
@@ -32,7 +32,7 @@ def gpio_change_callback(channel):
         print("Unknown GPIO input!")
         return
     if GPIO.input(channel): #if a key was pressed indicate which of the 3 inputs detected it
-        #print("GPIO", channel, "closed")
+        print("GPIO", channel, "closed")
         return
     else:                   #if a key was released indicate which of the 3 inputs detected it
         print("GPIO", channel, "open")
@@ -52,13 +52,14 @@ def phone_hook_callback(channel):
     else:
         print("this Phone is OFF the hook")
         modes.set_mode_by_number(1)
-        phonesound.play_dial_tone()
+        #phonesound.play_dial_tone()
+        phonesound.play_welcome_message()
         vmrecord.reset_vmStop()
 
 
 GPIO.add_event_detect(gpio_hook, GPIO.BOTH, callback=phone_hook_callback, bouncetime=1)
 
-# for i in gpio_inputs:  # for each GPIO input, call a function with the channel number
+#for i in gpio_inputs:  # for each GPIO input, call a function with the channel number
 #     GPIO.add_event_detect(i, GPIO.BOTH, callback=gpio_change_callback, bouncetime=10)
 #     gpio_change_callback(i) # also get the current state when starting the program
 #phone_hook_callback(gpio_hook)
@@ -72,9 +73,10 @@ def detectKeys(): # cycle through GPIO outputs and see if any inputs detect sign
         for j in range(len(gpio_inputs)):
             #print("testing into", j)
             if (GPIO.input(gpio_inputs[j]) == 1):
-                phonesound.stop_dial_tone()
+                #phonesound.stop_dial_tone()
+                phonesound.stop_welcome_message()
                 currentKey = lines[i][j]
-                #print("detected", currentKey)
+                print("detected", currentKey)
                 keypad.key_pressed(currentKey)
                 time.sleep(0.1)
                 while GPIO.input(gpio_inputs[j]) == 1:

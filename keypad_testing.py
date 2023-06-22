@@ -4,15 +4,19 @@ import time
 
 # these GPIO pins are connected to the keypad
 # change these according to your connections!
-L1 = 18
-L2 = 23
-L3 = 24
-L4 = 25
+
+# gpio_outputs = [26, 6, 13, 19] #columns - send current out connector B
+# gpio_inputs = [17, 27, 22] #lines/rows - detect current back connector A
+
+L1 = 26
+L2 = 6
+L3 = 13
+L4 = 19
 
 #C1 = 12
-C2 = 16
-C3 = 20
-C4 = 21
+C2 = 17
+C3 = 27
+C4 = 22
 
 # Initialize the GPIO pins
 
