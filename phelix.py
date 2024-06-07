@@ -53,7 +53,7 @@ def phone_hook_callback(channel):
         print("this Phone is OFF the hook")
         modes.set_mode_by_number(1)
         #phonesound.play_dial_tone()
-        phonesound.play_welcome_message()
+        phonesound.play_welcome_message() # can replace this with dial tone, also adjust stop below
         vmrecord.reset_vmStop()
 
 

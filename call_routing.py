@@ -18,8 +18,8 @@ def process_call(ext):
         vmrecord.start_recording_voicemail(ext)
     return
     
-def play_welcome_message(ext):
-    phonesound.play_voicemail(ext)
-    while(phonesound.pygame.mixer.get_busy()):
-            time.sleep(0.1)
-    return 
+# def play_welcome_message(ext):
+#     phonesound.play_voicemail(ext)
+#     while(phonesound.pygame.mixer.get_busy()):
+#             time.sleep(0.1)
+#     return 

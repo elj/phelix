@@ -48,7 +48,7 @@ def reset_keys_entered():
     keysEntered = ""
     
 def check_for_code_match():
-    if keysEntered in call_routing.extensions:
+    if keysEntered in call_routing.extensions: # change to: any 5-digit number
         print("match detected!")
         modes.set_mode_by_number(2)
         set_dialed_extension(keysEntered)

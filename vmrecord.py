@@ -6,6 +6,7 @@ import time
 import datetime
 import pyaudio
 import wave
+import sounddevice
     
 ### recording variables ###
 
@@ -13,7 +14,7 @@ chunk = 1024
 sample_format = pyaudio.paInt16
 channels = 2
 fs = 48000
-seconds = 180
+seconds = 5
 filename_base = "voicemail.wav"
 directory = "recordings"
 
@@ -54,7 +55,7 @@ def start_recording_voicemail(ext):
     print("Done recording!")
     
     ct = datetime.datetime.now()
-    filename = os.path.join(current_folder, directory, ext + "-" + str(ct.year) + "-" + str(ct.month) + "-" + str(ct.day) + "-" + str(ct.hour) + "h" + str(ct.minute) + "m" + str(ct.second) + "_" + filename_base)
+    filename = os.path.join(current_folder, directory, str(ext) + "-" + str(ct.year) + "-" + str(ct.month) + "-" + str(ct.day) + "-" + str(ct.hour) + "h" + str(ct.minute) + "m" + str(ct.second) + "_" + filename_base)
 
     wf = wave.open(filename, 'wb')
     wf.setnchannels(channels)
@@ -74,7 +75,7 @@ def reset_vmStop():
 def main(args):
     print("Recording for", seconds, "seconds")
     try:
-        start_recording_voicemail()
+        start_recording_voicemail(0)
     except KeyboardInterrupt:
         print("The end")
     return 0
