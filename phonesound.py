@@ -28,7 +28,7 @@ def play_welcome_message():  #play immediately after picking up the phone, inste
 #     welcome_msg.stop()
 #     time.sleep(0.3)
 #     welcome_msg.play(-1)
-    c1.play(welcome_msg, -1)
+    welcome_msg.play(-1)
     
 def stop_welcome_message():
     welcome_msg.fadeout(10)
@@ -48,7 +48,7 @@ def set_key_audio(k, desired_state):
 #         print("stopping door", d)
 #         doors[d][0].fadeout(doors[d][1])
 
-def play_voicemail(ext):  #replace for CallingCard
+def play_ext_msg(ext):  #replace for CallingCard
     ext_vm = voicemails[ext]
     ext_vm.play()
     
@@ -57,6 +57,12 @@ def process_hangup():
     
 def play_waymark():
     waymark.play()
+    
+def is_welcome_playing():
+    if welcome_msg.get_num_channels() > 0:
+        return True
+    else:
+        return False
     
 
 ### end functions ###
@@ -101,6 +107,8 @@ vm_ext4 = pygame.mixer.Sound(os.path.join(current_folder, 'sounds', 'vm_ext4.wav
 vm_ext5 = pygame.mixer.Sound(os.path.join(current_folder, 'sounds', 'vm_ext5.wav'))
 vm_ext7 = pygame.mixer.Sound(os.path.join(current_folder, 'sounds', 'vm_ext7.wav'))
 
+ext18007 = pygame.mixer.Sound(os.path.join(current_folder, 'sounds', 'MainNumber.wav'))
+
 waymark = pygame.mixer.Sound(os.path.join(current_folder, 'sounds', 'waymark_explorb.wav'))
 
 welcome_msg = pygame.mixer.Sound(os.path.join(current_folder, 'sounds', '6-channel44.wav'))
@@ -115,7 +123,8 @@ voicemails = {
     "4": vm_ext4,
     "5": vm_ext5,
     "6": waymark,
-    "7": vm_ext7
+    "7": vm_ext7,
+    "18007": ext18007
 }
 
 key_tones = {

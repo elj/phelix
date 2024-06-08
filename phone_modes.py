@@ -5,7 +5,7 @@
 
 currentMode = 0
 
-whichMode = ["phone_on_hook", "dialing", "active_call"]  #0, 1, 2
+whichMode = ["phone_on_hook", "dialing_accepted", "active_call"]  #0, 1, 2
 
 def get_mode():
     return currentMode
@@ -24,3 +24,7 @@ def set_mode_by_name(n):
         currentMode = i
     except:
         print("invalid mode, not set")
+        
+def allow_dialing():
+    global currentMode
+    currentMode = 1
