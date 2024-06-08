@@ -41,27 +41,25 @@ def gpio_change_callback(channel):
         for i in range(len(gpio_outputs)):  #set all 4 GPIO outputs to off
             GPIO.output(gpio_outputs[i], GPIO.LOW) #TODO: just set the currently active one off
             
-def accept_keypad_entry_loop():
-    global loop_running
-    print("K: starting keypad loop with", call_routing.digits, "digits and", call_routing.avail_ext)
-    loop_running = loop_running + 1
-    print("K: loop", loop_running)
+def accept_keypad_entry_loop(d):
+    ### collect keys entered until the desired number of keys have been entered
+    ### stop if phone hangs up / mode 0
+    #print("K: starting keypad loop with", d, "digits and", call_routing.avail_ext)
+    reset_keys_entered()
 
-    while modes.get_mode() != 0:
-        #print("K: Mode is", modes.get_mode())
-        if (modes.get_mode() == 1):   #if phone is off the hook and call is not started
+    while len(keysEntered) < d:
+        if (modes.get_mode() != 0):   #if phone is off the hook and call is not started
             #print("K: detecting keys")
-            detected = detectKeys()     # cycle through GPIO outputs one at a time
-            if detected:
-                call_routing.check_for_ext_match()
-        elif (modes.get_mode() == 2):
-            print("K: mode is 2")
-            detectKeys()
+            detectKeys()     # cycle through all GPIO outputs once and return ???
+        else:
+            return
+    print("K: returning total keys entered as", keysEntered)
+    return keysEntered
 
-            
-def detectKeys(): # cycle through GPIO outputs and see if any inputs detect signal
-    #print("K:starting to detect keys")
-    k = False
+
+def detectKeys(): # cycle through all the GPIO outputs once and see if any inputs detect signal
+    ("K:starting to detect keys")
+
     for i in range(len(gpio_outputs)):
         GPIO.output(gpio_outputs[i], GPIO.HIGH)
         #print("testing out of", gpio_outputs[i])
@@ -69,21 +67,17 @@ def detectKeys(): # cycle through GPIO outputs and see if any inputs detect sign
             #print("testing into", j)
             if (GPIO.input(gpio_inputs[j]) == 1):  
                 currentKey = lines[i][j]
-                #print("detected", currentKey)
+                print("detected", currentKey)
                 key_pressed(currentKey)
                 time.sleep(0.1)
                 while GPIO.input(gpio_inputs[j]) == 1:
                     time.sleep(0.05)
-                #print(currentKey, "released")
+                print(currentKey, "released")
                 key_unpressed(currentKey)
-                k = True
+
         GPIO.output(gpio_outputs[i], GPIO.LOW)
-        #print("K:DK: end i for loop")
-    #print("K:DK about to sleep a little")
-    time.sleep(0.1)
-    #print("done sleeping")
-    #print("anyButton=", anyButton)
-    return k
+    #print("about to sleep a little")
+    time.sleep(0.1)     # why do? still needed?
 
 anyKeyCurrentlyPressed = 0
 
