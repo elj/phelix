@@ -30,7 +30,6 @@ def set_digits(d):
 
 ### Functions for logic at each phone branch ##
 
-
 def dial_tone():
     print("USER: Starting dial tone and listening for digits")
     main_extensions = {"18007": story_list,
@@ -43,13 +42,10 @@ def dial_tone():
     dialed = ''
     while dialed not in main_extensions: ### FIGURE OUT LOOP HERE - collect sets of digits until an extension match is found
         dialed = keypad.accept_keypad_entry_loop(digits)
-        time.sleep(0.05)
+        if modes.on_hook():
+            return
+        #time.sleep(0.05)
     run = main_extensions[dialed]()
-    
-# ~ def process_initial_call(ext):
-    # ~ print("Processing call to", ext)
-    # ~ run = main_extensions[ext]()
-    # ~ return
 
 def story_list():
     # play the story options list
@@ -65,7 +61,9 @@ def story_list():
     print("CR: starting while loop in story list")
     while dialed not in story_ext:
         dialed = keypad.accept_keypad_entry_loop(1)
-        time.sleep(0.05)
+        if modes.on_hook():
+            return
+        #time.sleep(0.05)
     run = story_ext[dialed](dialed)
     # listen for key press
     
@@ -78,6 +76,8 @@ def play_story(story):
     dialed = ''
     while dialed not in mid_story_ext:
         dialed = keypad.accept_keypad_entry_loop(1)
+        if modes.on_hook():
+            return
     run = mid_story_ext[dialed]()
 
 def calling_card():
@@ -106,9 +106,9 @@ def calling_card():
     # ~ select_msg(0)
     
     
-# ~ def play_msg(num):
-    # ~ print("Playing message", num)
-    # ~ calling_card(0)
+def play_msg(num):
+    print("Playing message", num)
+    calling_card(0)
     
 
 

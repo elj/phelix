@@ -28,3 +28,9 @@ def set_mode_by_name(n):
 def allow_dialing():
     global currentMode
     currentMode = 1
+
+def on_hook():
+    if currentMode == 0:
+        return True
+    else:
+        return False

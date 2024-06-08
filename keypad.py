@@ -24,23 +24,8 @@ line4 = ["3", "2", "1"]
 
 lines = [line1, line2, line3, line4]
 
-keysEntered = ""
+keysEntered = ""    # Track the set of keys entered, as a string
 
-loop_running = 0
-
-def gpio_change_callback(channel):
-    if (channel == 0):
-        print("Unknown GPIO input!")
-        return
-    if GPIO.input(channel): #if a key was pressed indicate which of the 3 inputs detected it
-        print("GPIO", channel, "closed")
-        return
-    else:                   #if a key was released indicate which of the 3 inputs detected it
-        print("GPIO", channel, "open")
-        # TODO: figure out a way to use keypad.key_unpressed here?
-        for i in range(len(gpio_outputs)):  #set all 4 GPIO outputs to off
-            GPIO.output(gpio_outputs[i], GPIO.LOW) #TODO: just set the currently active one off
-            
 def accept_keypad_entry_loop(d):
     ### collect keys entered until the desired number of keys have been entered
     ### stop if phone hangs up / mode 0
@@ -88,7 +73,7 @@ def key_pressed(key):
         set_whether_any_key_pressed(1)
         print(key, "pressed")
         phonesound.stop_dial_tone() 	# stop the dial tone or welcome message if any key is pressed
-        phonesound.stop_welcome_message()	# TODO: maybe make a global stop for anything that isn't a key sound
+        phonesound.stop_welcome_message()	# TODO: maybe make a global stop for anything that isn't a key sound?
         phonesound.set_key_audio(key, 1)
     
 def key_unpressed(key):

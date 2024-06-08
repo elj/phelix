@@ -18,25 +18,21 @@ gpio_hook = 18
 GPIO.setup(gpio_hook, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 
 def phone_hook_callback(channel):
+    global call_start, call_end
     #print("hook state changed")
     if GPIO.input(channel) == 0:
         print("Phone ON hook")
-        #start_loop()
         modes.set_mode_by_number(0)
         phonesound.process_hangup()
         keypad.reset_keys_entered()
         call_routing.reset_digits()
         call_routing.reset_ext()
         vmrecord.stop_recording_voicemail()
-        #keypad.accept_keypad_entry_loop(0)
-        
+
     else:
         print("this Phone is OFF the hook")
         phonesound.stop_welcome_message()   # TODO: should probably stop any other audio here, too
-        #phonesound.play_dial_tone()
-        #phonesound.play_welcome_message() # can use dial tone or welcome message, also adjust stop below
         vmrecord.reset_vmStop()
-        call_routing.dial_tone()    ### Problem - this just runs and blocks the other callback option
 
 
 GPIO.add_event_detect(gpio_hook, GPIO.BOTH, callback=phone_hook_callback, bouncetime=1)
@@ -50,17 +46,25 @@ def start_loop():
 
 def main(args):
     print("starting Phelix, ready!")
-    
+    # keep running while waiting for input
+    # when phone is off the hook, start the simulation
+    # when phone is back on the hook, end the simulation but keep running
+
     try:
         while True:
-            continue
+            if GPIO.input(gpio_hook) == 1:
+                print("PH: starting dial tone")
+                call_routing.dial_tone()
+                time.sleep(0.1)
+            else:
+                #print("PH: phone on hook")
+                time.sleep(0.1)
 
-            
         print("PH: finished the first loop I started")
     except KeyboardInterrupt:
         GPIO.cleanup()
         print("PH: The end")
-        
+
     print("PH: about to end")
     return 0
 
