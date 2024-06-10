@@ -36,7 +36,7 @@ def story_list():
                  "3": play_story,
                  "4": play_story
                  }
-    print("USER: Pick 1 2 3 or 4 to hear that story, or 0 at any time")
+    print("USER: Pick 1 2 3 or 4 to hear that story")
     modes.allow_dialing()
     dialed = ''
     #print("CR: starting while loop in story list")
@@ -51,14 +51,20 @@ def story_list():
 def play_story(story):
     print("USER: Playing story", story)
     mid_story_ext = {"0": story_list
+                     "1": new_msg
+                     "2": post_story
                     }
     modes.allow_dialing()
     dialed = ''
+    # TODO: do something different when the story ends?
     while dialed not in mid_story_ext:
         dialed = keypad.accept_keypad_entry_loop(1)
         if modes.on_hook():
             return
     run = mid_story_ext[dialed]()
+
+def post_story():
+    print("USER: Story over")
 
 def calling_card():
     print("USER: Do you want to 1-leave a message or 2-hear a message?")
