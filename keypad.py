@@ -32,7 +32,7 @@ def accept_keypad_entry_loop(d):
     reset_keys_entered()
 
     while len(keysEntered) < d:
-        if (modes.get_mode() != 0):   #if phone is off the hook and call is not started
+        if modes.get_mode() == 1:   #if phone is off the hook and dialing is allowed
             #print("K: detecting keys")
             detectKeys()     # cycle through all GPIO outputs once and return ???
         else:

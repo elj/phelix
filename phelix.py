@@ -22,18 +22,16 @@ def phone_hook_callback(channel):
     #print("hook state changed")
     if GPIO.input(channel) == 0:
         print("Phone ON hook")
-        modes.set_mode_by_number(0)
-        phonesound.process_hangup()
-        keypad.reset_keys_entered()
-        vmrecord.stop_recording_voicemail()
+        call_reset()
+
 
     else:
         print("this Phone is OFF the hook")
         phonesound.stop_welcome_message()   # TODO: should probably stop any other audio here, too
-        vmrecord.reset_vmStop()
-
+        vmrecord.reset_vmRecord()
 
 GPIO.add_event_detect(gpio_hook, GPIO.BOTH, callback=phone_hook_callback, bouncetime=1)
+
 
 def start_loop():
     phonesound.play_welcome_message()

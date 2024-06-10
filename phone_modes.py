@@ -5,7 +5,7 @@
 
 currentMode = 0
 
-whichMode = ["phone_on_hook", "dialing_accepted", "active_call"]  #0, 1, 2
+whichMode = ["phone_on_hook", "dialing_accepted", "no_dialing"]  #0, 1, 2
 
 def get_mode():
     return currentMode
@@ -29,8 +29,18 @@ def allow_dialing():
     global currentMode
     currentMode = 1
 
+def prevent_dialing():
+    global currentMode
+    currentMode = 2
+
 def on_hook():
     if currentMode == 0:
+        return True
+    else:
+        return False
+
+def no_dialing():
+    if currentMode == 2:
         return True
     else:
         return False

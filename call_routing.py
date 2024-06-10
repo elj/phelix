@@ -28,6 +28,16 @@ def dial_tone():
             return
         #time.sleep(0.05)
     main_extensions[dialed]()
+    print("CR: Ending main dial tone?")
+    call_reset()
+
+def call_reset():
+    modes.set_mode_by_number(0)
+    phonesound.process_hangup()
+    keypad.reset_keys_entered()
+    vmrecord.stop_and_delete_voicemail()
+
+### PHELIX STORY OPTIONS ###
 
 def story_list():
     # play the story options list
@@ -50,8 +60,8 @@ def story_list():
     
 def play_story(story):
     print("USER: Playing story", story)
-    mid_story_ext = {"0": story_list
-                     "1": new_msg
+    mid_story_ext = {"0": story_list,
+                     "1": leave_msg,
                      "2": post_story
                     }
     modes.allow_dialing()
@@ -64,11 +74,13 @@ def play_story(story):
     run = mid_story_ext[dialed]()
 
 def post_story():
-    print("USER: Story over")
+    print("USER: Story over, goodbye")
+
+### CALLING CARD FUNCTIONS ###
 
 def calling_card():
     print("USER: Do you want to 1-leave a message or 2-hear a message?")
-    cc_ext = {"1": new_msg,
+    cc_ext = {"1": leave_msg,
               "2": select_msg
              }
     modes.allow_dialing()
@@ -79,7 +91,7 @@ def calling_card():
             return
     run = cc_ext[dialed]()
     
-def new_msg():
+def leave_msg():
     print("USER: Enter any 7-digit number where you want to leave a message")
     modes.allow_dialing()
     dialed = ''
@@ -133,17 +145,28 @@ def post_listen_msg(num):
 def record_msg(num):
     print("USER: Recording message at", num, "press any key when you're done")
     # TODO: Actually record, possibly re-recording/re-writing to file
+    # TODO: Recording times out before number is dialed?
+    vmrecord.start_recording_voicemail(num)
     dialed = 'a'
-    while dialed == "a":
+    listening = True
+    print("CR: Listening...")
+    while listening:
         dialed = keypad.accept_keypad_entry_loop(1)
         if modes.on_hook():
+            vmrecord.stop_and_delete_voicemail()
             return
+        if dialed != 'a':       # If user indicated they are done recording
+            listening = False
+        if modes.no_dialing():  # If max time reached on recording
+            listening = False
     # stop recording
-    post_listen_msg(num)
+    vmrecord.stop_and_save_voicemail()
+    post_rec_msg(num)
     
 def post_rec_msg(num):
     global post_msg_options_ext
     print("USER: Do you want to 1-save, 2-delete, 3-listen, or 4-rerecord?")
+    modes.allow_dialing()
     ext_options = post_msg_options_ext
     dialed = ''
     while dialed not in ext_options:
@@ -163,10 +186,11 @@ def save_msg(num):
 
 def delete_msg(num):
     global recorded_msgs_ext
-    print("USER: You message has been deleted. Beep beep beep...")
     # TODO: Actually delete file if it exists
     if num in recorded_msgs_ext:
         recorded_msgs_ext.pop(num)
+    vmrecord.delete_voicemail(num)
+    print("USER: You message at", num, "has been deleted. Beep beep beep...")
     if modes.on_hook():
         return
     time.sleep(2)
@@ -184,7 +208,7 @@ def add_num_to_recorded_list(num):
     recorded_msgs_ext[num] = play_msg
 
 
-### Allowable extensions to dial for each branch TODO: finish moving these to their functions
+### Extensions available at more than one branch
 
 
 post_msg_options_ext = {"1": save_msg,
@@ -194,7 +218,10 @@ post_msg_options_ext = {"1": save_msg,
                         }
 
 recorded_msgs_ext = {"1111111": play_msg,
-                     "1234567": play_msg
+                     "1234567": play_msg,
+                     "2222222": play_msg,
+                     "3333333": play_msg,
+                     "4444444": play_msg
                      }
 
     
