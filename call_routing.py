@@ -8,24 +8,7 @@ import phone_modes as modes
 import keypad
 
 
-### Functions for detecting whether an extension was dialed or not
-
-#dialed_ext = ""
-digits = 5     # default number of digits to check for when starting up
-
-# ~ def set_dialed_ext(ext):
-    # ~ global dialed_ext
-    # ~ dialed_ext = ext
-    # ~ print("CR: You dialed:", dialed_ext)
-    # ~ keypad.reset_keys_entered()
-    
-def reset_digits():
-    global digits
-    digits = 5
-    
-def set_digits(d):
-    global digits
-    digits = d
+initial_digits = 5     # default number of digits to check for when starting up
 
 
 ### Functions for logic at each phone branch ##
@@ -37,11 +20,10 @@ def dial_tone():
                        # "18003": debug
                        }
     phonesound.play_dial_tone()
-    set_available_ext_list(main_extensions)
     modes.allow_dialing()
     dialed = ''
     while dialed not in main_extensions: ### FIGURE OUT LOOP HERE - collect sets of digits until an extension match is found
-        dialed = keypad.accept_keypad_entry_loop(digits)
+        dialed = keypad.accept_keypad_entry_loop(initial_digits)
         if modes.on_hook():
             return
         #time.sleep(0.05)
@@ -54,11 +36,10 @@ def story_list():
                  "3": play_story,
                  "4": play_story
                  }
-    print("USER: Pick 1 2 3 or 4 to hear that story")
-    set_available_ext_list(story_ext)
+    print("USER: Pick 1 2 3 or 4 to hear that story, or 0 at any time")
     modes.allow_dialing()
     dialed = ''
-    print("CR: starting while loop in story list")
+    #print("CR: starting while loop in story list")
     while dialed not in story_ext:
         dialed = keypad.accept_keypad_entry_loop(1)
         if modes.on_hook():
@@ -68,10 +49,9 @@ def story_list():
     # listen for key press
     
 def play_story(story):
-    print("Playing story", story)
+    print("USER: Playing story", story)
     mid_story_ext = {"0": story_list
                     }
-    set_available_ext_list(mid_story_ext)
     modes.allow_dialing()
     dialed = ''
     while dialed not in mid_story_ext:
@@ -81,11 +61,10 @@ def play_story(story):
     run = mid_story_ext[dialed]()
 
 def calling_card():
-    print("USER: Do you want to 1 leave a message or 2 hear a message?")
+    print("USER: Do you want to 1-leave a message or 2-hear a message?")
     cc_ext = {"1": new_msg,
               "2": select_msg
              }
-    set_available_ext_list(cc_ext)
     modes.allow_dialing()
     dialed = ''
     while dialed not in cc_ext:
@@ -95,7 +74,7 @@ def calling_card():
     run = cc_ext[dialed]()
     
 def new_msg():
-    print("Enter any 7-digit number")
+    print("USER: Enter any 7-digit number where you want to leave a message")
     modes.allow_dialing()
     dialed = ''
     ### Collect 7 numbers
@@ -114,7 +93,6 @@ def new_msg():
     
 def select_msg():
     print("USER: Enter your destination number")
-    set_available_ext_list(recorded_msgs_ext)
     modes.allow_dialing()
     dialed = ''
     while dialed not in recorded_msgs_ext:
@@ -213,18 +191,6 @@ recorded_msgs_ext = {"1111111": play_msg,
                      "1234567": play_msg
                      }
 
-avail_ext = ''
-
-### Functions to manage the available extensions list
-
-def set_available_ext_list(ext_list):
-    global avail_ext
-    avail_ext = ext_list
-    
-def reset_ext():
-    global avail_ext
-    avail_ext = ''
-    
     
 # def play_welcome_message(ext):
 #     phonesound.play_ext_msg(ext)

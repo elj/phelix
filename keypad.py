@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 import time
-#import pygame
 import RPi.GPIO as GPIO
 import phone_modes as modes
 import phonesound
@@ -29,7 +28,7 @@ keysEntered = ""    # Track the set of keys entered, as a string
 def accept_keypad_entry_loop(d):
     ### collect keys entered until the desired number of keys have been entered
     ### stop if phone hangs up / mode 0
-    #print("K: starting keypad loop with", d, "digits and", call_routing.avail_ext)
+    #print("K: starting keypad loop with", d, "digits")
     reset_keys_entered()
 
     while len(keysEntered) < d:
@@ -52,12 +51,12 @@ def detectKeys(): # cycle through all the GPIO outputs once and see if any input
             #print("testing into", j)
             if (GPIO.input(gpio_inputs[j]) == 1):  
                 currentKey = lines[i][j]
-                print("detected", currentKey)
+                #print("detected", currentKey)
                 key_pressed(currentKey)
                 time.sleep(0.1)
                 while GPIO.input(gpio_inputs[j]) == 1:
                     time.sleep(0.05)
-                print(currentKey, "released")
+                #print(currentKey, "released")
                 key_unpressed(currentKey)
 
         GPIO.output(gpio_outputs[i], GPIO.LOW)
@@ -71,14 +70,14 @@ def key_pressed(key):
         return
     else:
         set_whether_any_key_pressed(1)
-        print(key, "pressed")
+        #print(key, "pressed")
         phonesound.stop_dial_tone() 	# stop the dial tone or welcome message if any key is pressed
         phonesound.stop_welcome_message()	# TODO: maybe make a global stop for anything that isn't a key sound?
         phonesound.set_key_audio(key, 1)
     
 def key_unpressed(key):
     set_whether_any_key_pressed(0)
-    print(key, "unpressed")
+    #print(key, "unpressed")
     add_to_keys_entered(key)
     phonesound.set_key_audio(key, 0)
     

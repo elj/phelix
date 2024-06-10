@@ -25,8 +25,6 @@ def phone_hook_callback(channel):
         modes.set_mode_by_number(0)
         phonesound.process_hangup()
         keypad.reset_keys_entered()
-        call_routing.reset_digits()
-        call_routing.reset_ext()
         vmrecord.stop_recording_voicemail()
 
     else:
@@ -63,9 +61,9 @@ def main(args):
         print("PH: finished the first loop I started")
     except KeyboardInterrupt:
         GPIO.cleanup()
-        print("PH: The end")
+        print("PH: Exiting with cleanup")
 
-    print("PH: about to end")
+    print("PH: The end")
     return 0
 
 if __name__ == '__main__':
