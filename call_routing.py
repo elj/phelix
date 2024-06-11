@@ -6,7 +6,8 @@ import phonesound
 import vmrecord
 import phone_modes as modes
 import keypad
-
+#import recorder
+import voicemail as vm
 
 initial_digits = 5     # default number of digits to check for when starting up
 
@@ -35,7 +36,7 @@ def call_reset():
     modes.set_mode_by_number(0)
     phonesound.process_hangup()
     keypad.reset_keys_entered()
-    vmrecord.stop_and_delete_voicemail()
+    #vmrecord.stop_and_delete_voicemail()
 
 ### PHELIX STORY OPTIONS ###
 
@@ -142,26 +143,40 @@ def post_listen_msg(num):
             return
     run = ext_options[dialed](num)
 
+### Do all the recording stuff in voicemail
 def record_msg(num):
-    print("USER: Recording message at", num, "press any key when you're done")
-    # TODO: Actually record, possibly re-recording/re-writing to file
-    # TODO: Recording times out before number is dialed?
-    vmrecord.start_recording_voicemail(num)
-    dialed = 'a'
-    listening = True
-    print("CR: Listening...")
-    while listening:
-        dialed = keypad.accept_keypad_entry_loop(1)
-        if modes.on_hook():
-            vmrecord.stop_and_delete_voicemail()
-            return
-        if dialed != 'a':       # If user indicated they are done recording
-            listening = False
-        if modes.no_dialing():  # If max time reached on recording
-            listening = False
-    # stop recording
-    vmrecord.stop_and_save_voicemail()
+    print("USER: Recording test message, press any key when done")
+
+    vm.start_recording(num)
+    print("CR: Done with recording stuff, moving on")
     post_rec_msg(num)
+
+### Do all the recording stuff in this file
+# ~ def record_msg(num):
+    # ~ print("USER: Recording message at", num, "press any key when you're done")
+    # ~ # TODO: Actually record, possibly re-recording/re-writing to file
+    # ~ # TODO: Recording times out before number is dialed?
+    # ~ rec = recorder.Recorder(channels=2)
+    # ~ with rec.open('test_record.wav', 'wb') as recfile:
+        # ~ recfile.start_recording()
+        # ~ dialed = 'a'
+        # ~ waiting = True
+        # ~ print("CR: Waiting for input or timeout...")
+        # ~ while waiting:
+            # ~ dialed = keypad.accept_keypad_entry_loop(1)
+            # ~ if modes.on_hook():
+                # ~ # Stop and delete voicemail
+                # ~ recfile.stop_recording()
+                # ~ return
+            # ~ if dialed != 'a':
+                # ~ # If user indicated they are done recording, Stop and save voicemail
+                # ~ waiting = False
+            # ~ if modes.no_dialing():
+                # ~ # If max time reached on recording, stop checking for dials
+                # ~ waiting = False
+    # ~ # stop recording
+    # ~ recfile.stop_recording()
+    # ~ post_rec_msg(num)
     
 def post_rec_msg(num):
     global post_msg_options_ext
@@ -220,8 +235,7 @@ post_msg_options_ext = {"1": save_msg,
 recorded_msgs_ext = {"1111111": play_msg,
                      "1234567": play_msg,
                      "2222222": play_msg,
-                     "3333333": play_msg,
-                     "4444444": play_msg
+                     "3333333": play_msg
                      }
 
     

@@ -38,7 +38,9 @@ def accept_keypad_entry_loop(d):
         else:
             return
     print("K: returning total keys entered as", keysEntered)
-    return keysEntered
+    thesekeys = keysEntered
+    reset_keys_entered()
+    return thesekeys
 
 
 def detectKeys(): # cycle through all the GPIO outputs once and see if any inputs detect signal
