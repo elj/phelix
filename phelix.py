@@ -3,12 +3,12 @@
 
 import RPi.GPIO as GPIO
 import time
-import pygame
-import phonesound
+#import pygame
+#import phonesound
 import call_routing
-import keypad
+#import keypad
 import phone_modes as modes
-#import voicemail
+import voicemail as vm
 
 GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)
@@ -25,17 +25,11 @@ def phone_hook_callback(channel):
         call_routing.call_reset()
     else:
         print("this Phone is OFF the hook")
-        #phonesound.stop_welcome_message()   # TODO: should probably stop any other audio here, too
-        #vmrecord.reset_vmRecord()
+        modes.allow_dialing()
+
 
 GPIO.add_event_detect(gpio_hook, GPIO.BOTH, callback=phone_hook_callback, bouncetime=1)
 
-
-# ~ def start_loop():
-    # ~ phonesound.play_welcome_message()
-    # ~ while phonesound.is_welcome_playing():
-        # ~ time.sleep(0.01)
-    # ~ print("PH: it stopped playing")
 
 
 def main(args):
@@ -43,6 +37,9 @@ def main(args):
     # keep running while waiting for input
     # when phone is off the hook, start the simulation
     # when phone is back on the hook, end the simulation but keep running
+
+    ## TODO: load VM files here
+    vm.read_initial_vm_files()
 
     try:
         while True:

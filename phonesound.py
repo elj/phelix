@@ -9,12 +9,19 @@ import time
 # set number of desired asynchronous channels (referenced later in mixer setup)
 number_of_channels = 8
 
-# set final fadeout time
-exitfade = 1000
+# look for sound & music files in subfolder 'data'
+#pygame.mixer.music.load(os.path.join('data', 'loophole.wav'))#load music
+current_folder = os.path.dirname(__file__)
+print("sounds folder = ", current_folder)
+vm_files = {}
 
 ### end custom variables ###
     
 ### functions and stuff go here ###
+def load_vm_files_as_sounds(files):
+    print("loading VM files as sounds")
+    ## TODO: actually load the files
+
 
 def play_dial_tone():
     dialtone.stop()
@@ -64,6 +71,7 @@ def is_voice_playing():
 def is_vm_playing():
     return vm.get_busy()
 
+
 ### end functions ###
 
 pygame.mixer.pre_init(44100, -16, 6, 4096) # setup mixer to avoid sound lag
@@ -78,11 +86,6 @@ voice = pygame.mixer.Channel(2)
 vm = pygame.mixer.Channel(3)
 #c1.set_volume(0.1, 0.9)
 
-# look for sound & music files in subfolder 'data'
-#pygame.mixer.music.load(os.path.join('data', 'loophole.wav'))#load music
-current_folder = os.path.dirname(__file__)
-print("sounds folder = ", current_folder)
-
 # Temp voice files
 main_cc = pygame.mixer.Sound(os.path.join(current_folder, 'sounds', 'CallingCard.wav'))
 main_phelix = pygame.mixer.Sound(os.path.join(current_folder, 'sounds', 'MainNumber.wav'))
@@ -95,6 +98,7 @@ enter_num = pygame.mixer.Sound(os.path.join(current_folder, 'sounds', 'EnteringM
 retrieve_msg = pygame.mixer.Sound(os.path.join(current_folder, 'sounds', 'Retrieval.wav'))
 no_msg = pygame.mixer.Sound(os.path.join(current_folder, 'sounds', 'NoMessage.wav'))
 post_rec = pygame.mixer.Sound(os.path.join(current_folder, 'sounds', 'EndRecording.wav'))
+post_listen = pygame.mixer.Sound(os.path.join(current_folder, 'sounds', 'EndRecording.wav'))
 vm_saved = pygame.mixer.Sound(os.path.join(current_folder, 'sounds', 'Saved.wav'))
 vm_deleted = pygame.mixer.Sound(os.path.join(current_folder, 'sounds', 'Deleted.wav'))
 reached = pygame.mixer.Sound(os.path.join(current_folder, 'sounds', 'Reached.wav'))
@@ -112,6 +116,7 @@ ext_audio = {
     "retrieve_msg": retrieve_msg,
     "no_msg": no_msg,
     "post_rec": post_rec,
+    "post_listen": post_listen,
     "vm_saved": vm_saved,
     "vm_deleted": vm_deleted,
     "reached": reached

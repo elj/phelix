@@ -103,14 +103,14 @@ def enter_num_to_leave_msg():
     modes.allow_dialing()
     dialed = ''
     ### Collect 7 numbers
-    ### If it is already in the recorded_msgs_ext list, error and try again
-    ### If it is not in the recorded messages list, proceed to record
+    ### If it is already in the voicemail_nums list, error and try again
+    ### TODO: If it is not in the recorded messages list, proceed to record?
     resolved = False
     while not resolved:
         dialed = keypad.accept_keypad_entry_loop(7)
         if modes.on_hook():
             return
-        if dialed in recorded_msgs_ext:
+        if dialed in vm.voicemail_nums:
             print("USER: Sorry, try a different number")
         else:
             resolved = True
@@ -122,31 +122,35 @@ def retrieve_msg():
     phonesound.play_ext_msg("retrieve_msg")
     modes.allow_dialing()
     dialed = ''
-    while dialed not in recorded_msgs_ext:
+    while dialed not in vm.voicemail_nums:
         dialed = keypad.accept_keypad_entry_loop(7)
         if modes.on_hook():
             return
-        elif dialed not in recorded_msgs_ext:
+        elif dialed not in vm.voicemail_nums:
             print("USER: Message not found at that number, try again")
     modes.prevent_dialing()
-    recorded_msgs_ext[dialed](dialed)
+    play_requested_msg(dialed)
 
 # ~ def msg_not_found():
     # ~ print("Sorry, that number doesn't have a message")
     # ~ select_msg(0)
 
-def play_msg(num):
-    print("USER: Playing message", num)
+def play_requested_msg(num):
+    print("USER: Attempting to play the message", num)
+    if num in vm.voicemail_nums:
+        print("USER: Playing the message...")
+        time.sleep(0.1)
     # TODO: actually play the message here
     while phonesound.is_vm_playing():
         if modes.on_hook():
             return
     post_listen_msg(num)
 
+### Do this after playing a requested message
 def post_listen_msg(num):
     global post_msg_options_ext
-    print("USER: Do you want to 1-save, 2-delete, 3-listen, or 4-rerecord?")
-    phonesound.play_ext_msg("post_story")
+    print("USER: Do you want to 1-save, 2-delete, 3-listen again, or 4-rerecord?")
+    phonesound.play_ext_msg("post_rec")
     ext_options = post_msg_options_ext
     modes.allow_dialing()
     dialed = ''
@@ -169,7 +173,8 @@ def record_msg(num):
     print("CR: Done with recording stuff, moving on")
     modes.prevent_dialing()
     post_rec_msg(num)
-    
+
+### Post-recording, always do this
 def post_rec_msg(num):
     global post_msg_options_ext
     print("USER: Do you want to 1-save, 2-delete, 3-listen, or 4-rerecord?")
@@ -182,25 +187,24 @@ def post_rec_msg(num):
         if modes.on_hook():
             return
     modes.prevent_dialing()
-    if dialed == "3":
-        add_num_to_recorded_list(num)
+    if dialed == "3" or dialed == "1":   # (Implicitly) save the message
+        vm.add_num_to_vm_list(num)
     ext_options[dialed](num)
+
+
+### Post-recording menu options
 
 def save_msg(num):
     print("USER: Saving message to list. To hear it again, call back and enter", num)
     phonesound.play_ext_msg("vm_saved")
-    add_num_to_recorded_list(num)
-    if modes.on_hook():
-        return
     while phonesound.is_voice_playing():
+        if modes.on_hook():
+            return
         time.sleep(0.1)
     print("hanging up...")
 
 def delete_msg(num):
-    global recorded_msgs_ext
-    # TODO: Actually delete file if it exists
-    if num in recorded_msgs_ext:
-        recorded_msgs_ext.pop(num)
+    print("USER: Attempting to delete vm at ", num)
     vm.delete_voicemail(num)
     print("USER: You message at", num, "has been deleted. Beep beep beep...")
     phonesound.play_ext_msg("vm_deleted")
@@ -216,9 +220,11 @@ def listen_to_msg(num):
         return
     play_msg(num)
 
-def add_num_to_recorded_list(num):
-    global recorded_msgs_ext
-    recorded_msgs_ext[num] = play_msg
+## TODO: Replace with vm function
+# ~ def add_num_to_recorded_list(num):
+    # ~ global recorded_msgs_ext
+    # ~ recorded_msgs_ext[num] = play_msg
+    # ~ print("CR: VM list", recorded_msgs_ext)
 
 
 ### Extensions available at more than one branch
@@ -230,11 +236,11 @@ post_msg_options_ext = {"1": save_msg,
                         "4": record_msg
                         }
 
-recorded_msgs_ext = {"5751377": play_msg,
-                     "4444444": play_msg,
-                     "5555555": play_msg,
-                     "6666666": play_msg
-                     }
+# ~ recorded_msgs_ext = {"5751377": play_msg,
+                     # ~ "4444444": play_msg,
+                     # ~ "5555555": play_msg,
+                     # ~ "6666666": play_msg
+                     # ~ }
 
 def update_voicemails_list():
     # TODO - update the initial list based on actual files in /recordings

@@ -15,9 +15,23 @@ max_time = 15
 filename_base = ".wav"
 directory = "recordings"
 
+# initialize empty list to keep recorded voicemail numbers
+voicemail_nums = []
+
 current_folder = os.path.dirname(__file__)
 print("VM: recording base folder = ", current_folder)
 
+def read_initial_vm_files():
+    global voicemail_nums
+    files = os.listdir(os.path.join(current_folder, "recordings"))
+    print("Recordings", files)
+    for f in files:
+        voicemail_nums.append(f.split(".")[0])
+    print("Initial VM numbers:", voicemail_nums)
+
+def add_num_to_vm_list(num):
+    global voicemail_nums
+    voicemail_nums.append(num)
 
 def start_recording(num):
     # Start recording
@@ -60,6 +74,9 @@ def start_recording(num):
     recfile.stop_recording()
 
 def delete_voicemail(num):
+    global voicemail_nums
+    while num in voicemail_nums:
+        voicemail_nums.remove(num)
     file_to_delete = os.path.join(current_folder, directory, num + filename_base)
     print("VM: Deleting file at", file_to_delete)
     if os.path.exists(file_to_delete):
