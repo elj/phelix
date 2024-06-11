@@ -55,7 +55,7 @@ def detectKeys(): # cycle through all the GPIO outputs once and see if any input
                 currentKey = lines[i][j]
                 #print("detected", currentKey)
                 key_pressed(currentKey)
-                time.sleep(0.1)
+                #time.sleep(0.1)
                 while GPIO.input(gpio_inputs[j]) == 1:
                     time.sleep(0.05)
                 #print(currentKey, "released")
@@ -63,7 +63,7 @@ def detectKeys(): # cycle through all the GPIO outputs once and see if any input
 
         GPIO.output(gpio_outputs[i], GPIO.LOW)
     #print("about to sleep a little")
-    time.sleep(0.1)     # why do? still needed?
+    #time.sleep(0.1)     # why do? still needed?
 
 anyKeyCurrentlyPressed = 0
 

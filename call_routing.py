@@ -3,10 +3,8 @@
 
 import time
 import phonesound
-import vmrecord
 import phone_modes as modes
 import keypad
-#import recorder
 import voicemail as vm
 
 initial_digits = 5     # default number of digits to check for when starting up
@@ -29,7 +27,7 @@ def dial_tone():
             return
         #time.sleep(0.05)
     main_extensions[dialed]()
-    print("CR: Ending main dial tone?")
+    print("CR: Ending main dial tone")
     call_reset()
 
 def call_reset():
@@ -145,38 +143,12 @@ def post_listen_msg(num):
 
 ### Do all the recording stuff in voicemail
 def record_msg(num):
+    print("USER: Playing voicemail message...")
+    time.sleep(2)
     print("USER: Recording test message, press any key when done")
-
     vm.start_recording(num)
     print("CR: Done with recording stuff, moving on")
     post_rec_msg(num)
-
-### Do all the recording stuff in this file
-# ~ def record_msg(num):
-    # ~ print("USER: Recording message at", num, "press any key when you're done")
-    # ~ # TODO: Actually record, possibly re-recording/re-writing to file
-    # ~ # TODO: Recording times out before number is dialed?
-    # ~ rec = recorder.Recorder(channels=2)
-    # ~ with rec.open('test_record.wav', 'wb') as recfile:
-        # ~ recfile.start_recording()
-        # ~ dialed = 'a'
-        # ~ waiting = True
-        # ~ print("CR: Waiting for input or timeout...")
-        # ~ while waiting:
-            # ~ dialed = keypad.accept_keypad_entry_loop(1)
-            # ~ if modes.on_hook():
-                # ~ # Stop and delete voicemail
-                # ~ recfile.stop_recording()
-                # ~ return
-            # ~ if dialed != 'a':
-                # ~ # If user indicated they are done recording, Stop and save voicemail
-                # ~ waiting = False
-            # ~ if modes.no_dialing():
-                # ~ # If max time reached on recording, stop checking for dials
-                # ~ waiting = False
-    # ~ # stop recording
-    # ~ recfile.stop_recording()
-    # ~ post_rec_msg(num)
     
 def post_rec_msg(num):
     global post_msg_options_ext
@@ -204,7 +176,7 @@ def delete_msg(num):
     # TODO: Actually delete file if it exists
     if num in recorded_msgs_ext:
         recorded_msgs_ext.pop(num)
-    vmrecord.delete_voicemail(num)
+    vm.delete_voicemail(num)
     print("USER: You message at", num, "has been deleted. Beep beep beep...")
     if modes.on_hook():
         return
@@ -213,7 +185,6 @@ def delete_msg(num):
 
 def listen_to_msg(num):
     add_num_to_recorded_list(num)
-    # TODO: anything to actually save the recorded file
     if modes.on_hook():
         return
     play_msg(num)
@@ -232,12 +203,15 @@ post_msg_options_ext = {"1": save_msg,
                         "4": record_msg
                         }
 
-recorded_msgs_ext = {"1111111": play_msg,
-                     "1234567": play_msg,
-                     "2222222": play_msg,
-                     "3333333": play_msg
+recorded_msgs_ext = {"5751377": play_msg,
+                     "4444444": play_msg,
+                     "5555555": play_msg,
+                     "6666666": play_msg
                      }
 
+def update_voicemails_list():
+    # TODO - update the initial list based on actual files in /recordings
+    print("Updating voicemails list - not yet implemented")
     
 # def play_welcome_message(ext):
 #     phonesound.play_ext_msg(ext)
