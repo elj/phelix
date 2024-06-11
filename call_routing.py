@@ -40,6 +40,7 @@ def call_reset():
 
 def story_list():
     # play the story options list
+    phonesound.play_ext_msg("main_phelix")
     story_ext = {"1": play_story,
                  "2": play_story,
                  "3": play_story,
@@ -57,8 +58,10 @@ def story_list():
     run = story_ext[dialed](dialed)
     # listen for key press
     
-def play_story(story):
-    print("USER: Playing story", story)
+def play_story(story_num):
+    print("USER: Playing story", story_num)
+    story_sound = "story" + story_num
+    phonesound.play_ext_msg(story_sound)
     mid_story_ext = {"0": story_list,
                      "1": leave_msg,
                      "2": post_story
@@ -79,8 +82,9 @@ def post_story():
 
 def calling_card():
     print("USER: Do you want to 1-leave a message or 2-hear a message?")
-    cc_ext = {"1": leave_msg,
-              "2": select_msg
+    phonesound.play_ext_msg("main_cc")
+    cc_ext = {"1": enter_num_to_leave_msg,
+              "2": retrieve_msg
              }
     modes.allow_dialing()
     dialed = ''
@@ -88,10 +92,11 @@ def calling_card():
         dialed = keypad.accept_keypad_entry_loop(1)
         if modes.on_hook():
             return
-    run = cc_ext[dialed]()
+    cc_ext[dialed]()
     
-def leave_msg():
+def enter_num_to_leave_msg():
     print("USER: Enter any 7-digit number where you want to leave a message")
+    phonesound.play_ext_msg("enter_num")
     modes.allow_dialing()
     dialed = ''
     ### Collect 7 numbers
@@ -108,8 +113,9 @@ def leave_msg():
             resolved = True
     record_msg(dialed)
     
-def select_msg():
+def retrieve_msg():
     print("USER: Enter your destination number")
+    phonesound.play_ext_msg("retrieve_msg")
     modes.allow_dialing()
     dialed = ''
     while dialed not in recorded_msgs_ext:
@@ -133,6 +139,7 @@ def play_msg(num):
 def post_listen_msg(num):
     global post_msg_options_ext
     print("USER: Do you want to 1-save, 2-delete, 3-listen, or 4-rerecord?")
+    phonesound.play_ext_msg("post_story")
     ext_options = post_msg_options_ext
     dialed = ''
     while dialed not in ext_options:
@@ -144,7 +151,9 @@ def post_listen_msg(num):
 ### Do all the recording stuff in voicemail
 def record_msg(num):
     print("USER: Playing voicemail message...")
-    time.sleep(2)
+    phonesound.play_ext_msg("reached")
+    while phonesound.is_voice_playing():
+        time.sleep(0.1)
     print("USER: Recording test message, press any key when done")
     vm.start_recording(num)
     print("CR: Done with recording stuff, moving on")
@@ -153,6 +162,7 @@ def record_msg(num):
 def post_rec_msg(num):
     global post_msg_options_ext
     print("USER: Do you want to 1-save, 2-delete, 3-listen, or 4-rerecord?")
+    phonesound.play_ext_msg("post_rec")
     modes.allow_dialing()
     ext_options = post_msg_options_ext
     dialed = ''
@@ -164,11 +174,12 @@ def post_rec_msg(num):
 
 def save_msg(num):
     print("USER: Saving message to list. To hear it again, call back and enter", num)
-    # TODO: any actual stuff for saving the file
+    phonesound.play_ext_msg("vm_saved")
     add_num_to_recorded_list(num)
     if modes.on_hook():
         return
-    time.sleep(2)
+    while phonesound.is_voice_playing():
+        time.sleep(0.1)
     print("hanging up...")
 
 def delete_msg(num):
@@ -178,12 +189,15 @@ def delete_msg(num):
         recorded_msgs_ext.pop(num)
     vm.delete_voicemail(num)
     print("USER: You message at", num, "has been deleted. Beep beep beep...")
+    phonesound.play_ext_msg("vm_deleted")
     if modes.on_hook():
         return
-    time.sleep(2)
+    while phonesound.is_voice_playing():
+        time.sleep(0.1)
     print("hanging up...")
 
 def listen_to_msg(num):
+    # TODO: Fix this so it doesn't keep adding to the list
     add_num_to_recorded_list(num)
     if modes.on_hook():
         return
