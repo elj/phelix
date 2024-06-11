@@ -26,6 +26,7 @@ def dial_tone():
         if modes.on_hook():
             return
         #time.sleep(0.05)
+    modes.prevent_dialing()
     main_extensions[dialed]()
     print("CR: Ending main dial tone")
     call_reset()
@@ -54,16 +55,16 @@ def story_list():
         dialed = keypad.accept_keypad_entry_loop(1)
         if modes.on_hook():
             return
-        #time.sleep(0.05)
-    run = story_ext[dialed](dialed)
-    # listen for key press
+    modes.prevent_dialing()
+    story_ext[dialed](dialed)
+
     
 def play_story(story_num):
     print("USER: Playing story", story_num)
     story_sound = "story" + story_num
     phonesound.play_ext_msg(story_sound)
     mid_story_ext = {"0": story_list,
-                     "1": leave_msg,
+                     "1": enter_num_to_leave_msg,
                      "2": post_story
                     }
     modes.allow_dialing()
@@ -73,7 +74,8 @@ def play_story(story_num):
         dialed = keypad.accept_keypad_entry_loop(1)
         if modes.on_hook():
             return
-    run = mid_story_ext[dialed]()
+    modes.prevent_dialing()
+    mid_story_ext[dialed]()
 
 def post_story():
     print("USER: Story over, goodbye")
@@ -92,6 +94,7 @@ def calling_card():
         dialed = keypad.accept_keypad_entry_loop(1)
         if modes.on_hook():
             return
+    modes.prevent_dialing()
     cc_ext[dialed]()
     
 def enter_num_to_leave_msg():
@@ -111,6 +114,7 @@ def enter_num_to_leave_msg():
             print("USER: Sorry, try a different number")
         else:
             resolved = True
+    modes.prevent_dialing()
     record_msg(dialed)
     
 def retrieve_msg():
@@ -124,7 +128,8 @@ def retrieve_msg():
             return
         elif dialed not in recorded_msgs_ext:
             print("USER: Message not found at that number, try again")
-    run = recorded_msgs_ext[dialed](dialed)
+    modes.prevent_dialing()
+    recorded_msgs_ext[dialed](dialed)
 
 # ~ def msg_not_found():
     # ~ print("Sorry, that number doesn't have a message")
@@ -132,8 +137,10 @@ def retrieve_msg():
 
 def play_msg(num):
     print("USER: Playing message", num)
-    if modes.on_hook():
-        return
+    # TODO: actually play the message here
+    while phonesound.is_vm_playing():
+        if modes.on_hook():
+            return
     post_listen_msg(num)
 
 def post_listen_msg(num):
@@ -141,12 +148,14 @@ def post_listen_msg(num):
     print("USER: Do you want to 1-save, 2-delete, 3-listen, or 4-rerecord?")
     phonesound.play_ext_msg("post_story")
     ext_options = post_msg_options_ext
+    modes.allow_dialing()
     dialed = ''
     while dialed not in ext_options:
         dialed = keypad.accept_keypad_entry_loop(1)
         if modes.on_hook():
             return
-    run = ext_options[dialed](num)
+    modes.prevent_dialing()
+    ext_options[dialed](num)
 
 ### Do all the recording stuff in voicemail
 def record_msg(num):
@@ -155,8 +164,10 @@ def record_msg(num):
     while phonesound.is_voice_playing():
         time.sleep(0.1)
     print("USER: Recording test message, press any key when done")
+    modes.allow_dialing()
     vm.start_recording(num)
     print("CR: Done with recording stuff, moving on")
+    modes.prevent_dialing()
     post_rec_msg(num)
     
 def post_rec_msg(num):
@@ -170,7 +181,10 @@ def post_rec_msg(num):
         dialed = keypad.accept_keypad_entry_loop(1)
         if modes.on_hook():
             return
-    run = ext_options[dialed](num)
+    modes.prevent_dialing()
+    if dialed == "3":
+        add_num_to_recorded_list(num)
+    ext_options[dialed](num)
 
 def save_msg(num):
     print("USER: Saving message to list. To hear it again, call back and enter", num)
@@ -197,8 +211,7 @@ def delete_msg(num):
     print("hanging up...")
 
 def listen_to_msg(num):
-    # TODO: Fix this so it doesn't keep adding to the list
-    add_num_to_recorded_list(num)
+    # TODO: Actually listen to the message
     if modes.on_hook():
         return
     play_msg(num)

@@ -57,10 +57,13 @@ def is_welcome_playing():
         return True
     else:
         return False
-    
 
 def is_voice_playing():
     return voice.get_busy()
+
+def is_vm_playing():
+    return vm.get_busy()
+
 ### end functions ###
 
 pygame.mixer.pre_init(44100, -16, 6, 4096) # setup mixer to avoid sound lag
@@ -72,6 +75,7 @@ pygame.mixer.set_num_channels(number_of_channels)  # must come *after* .init
 c1 = pygame.mixer.Channel(1)
 keys = pygame.mixer.Channel(0)
 voice = pygame.mixer.Channel(2)
+vm = pygame.mixer.Channel(3)
 #c1.set_volume(0.1, 0.9)
 
 # look for sound & music files in subfolder 'data'
