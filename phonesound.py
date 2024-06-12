@@ -18,9 +18,12 @@ vm_files = {}
 ### end custom variables ###
     
 ### functions and stuff go here ###
-def load_vm_files_as_sounds(files):
+def load_and_play_vm(num):
     print("loading VM files as sounds")
     ## TODO: actually load the files
+    vm_filename = num + ".wav"
+    vm_sound = pygame.mixer.Sound(os.path.join(current_folder, 'recordings', vm_filename))
+    vm.play(vm_sound)
 
 
 def play_dial_tone():
@@ -119,7 +122,8 @@ ext_audio = {
     "post_listen": post_listen,
     "vm_saved": vm_saved,
     "vm_deleted": vm_deleted,
-    "reached": reached
+    "reached": reached,
+    "vm_intro": reached
     }
 
 

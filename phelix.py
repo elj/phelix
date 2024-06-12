@@ -3,8 +3,8 @@
 
 import RPi.GPIO as GPIO
 import time
-#import pygame
-#import phonesound
+import pygame
+import phonesound
 import call_routing
 #import keypad
 import phone_modes as modes

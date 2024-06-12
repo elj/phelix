@@ -27,7 +27,10 @@ def read_initial_vm_files():
     print("Recordings", files)
     for f in files:
         voicemail_nums.append(f.split(".")[0])
-    print("Initial VM numbers:", voicemail_nums)
+    print("Initial VM numbers:")
+    for v in voicemail_nums:
+        print(v)
+    
 
 def add_num_to_vm_list(num):
     global voicemail_nums

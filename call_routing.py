@@ -138,9 +138,16 @@ def retrieve_msg():
 def play_requested_msg(num):
     print("USER: Attempting to play the message", num)
     if num in vm.voicemail_nums:
-        print("USER: Playing the message...")
+        print("CR: number found")
         time.sleep(0.1)
     # TODO: actually play the message here
+    phonesound.play_ext_msg("vm_intro")
+    print("CR: Playing VM intro")
+    while phonesound.is_voice_playing():
+        if modes.on_hook():
+            return
+    phonesound.load_and_play_vm(num)
+    print("USER: Playing message")
     while phonesound.is_vm_playing():
         if modes.on_hook():
             return
@@ -177,7 +184,7 @@ def record_msg(num):
 ### Post-recording, always do this
 def post_rec_msg(num):
     global post_msg_options_ext
-    print("USER: Do you want to 1-save, 2-delete, 3-listen, or 4-rerecord?")
+    print("USER: Do you want to 1-listen, 2-save, 3-delete, or 4-rerecord?")
     phonesound.play_ext_msg("post_rec")
     modes.allow_dialing()
     ext_options = post_msg_options_ext
@@ -214,11 +221,6 @@ def delete_msg(num):
         time.sleep(0.1)
     print("hanging up...")
 
-def listen_to_msg(num):
-    # TODO: Actually listen to the message
-    if modes.on_hook():
-        return
-    play_msg(num)
 
 ## TODO: Replace with vm function
 # ~ def add_num_to_recorded_list(num):
@@ -230,9 +232,9 @@ def listen_to_msg(num):
 ### Extensions available at more than one branch
 
 
-post_msg_options_ext = {"1": save_msg,
-                        "2": delete_msg,
-                        "3": listen_to_msg,
+post_msg_options_ext = {"2": save_msg,
+                        "3": delete_msg,
+                        "1": play_requested_msg,
                         "4": record_msg
                         }
 

@@ -44,7 +44,7 @@ def accept_keypad_entry_loop(d):
 
 
 def detectKeys(): # cycle through all the GPIO outputs once and see if any inputs detect signal
-    ("K:starting to detect keys")
+    #print("K:starting to detect keys")
 
     for i in range(len(gpio_outputs)):
         GPIO.output(gpio_outputs[i], GPIO.HIGH)
@@ -55,7 +55,7 @@ def detectKeys(): # cycle through all the GPIO outputs once and see if any input
                 currentKey = lines[i][j]
                 #print("detected", currentKey)
                 key_pressed(currentKey)
-                #time.sleep(0.1)
+                time.sleep(0.05)
                 while GPIO.input(gpio_inputs[j]) == 1:
                     time.sleep(0.05)
                 #print(currentKey, "released")
