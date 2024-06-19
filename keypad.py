@@ -34,9 +34,12 @@ def accept_keypad_entry_loop(d):
     while len(keysEntered) < d:
         if modes.get_mode() == 1:   #if phone is off the hook and dialing is allowed
             #print("K: detecting keys")
-            detectKeys()     # cycle through all GPIO outputs once and return ???
-        else:
+            detectKeys()     # cycle through all GPIO outputs once
+        else:   # if phone is on the hook or dialing not allowed
             return
+        if keysEntered == "0":
+            print("Operator dialed")
+            return keysEntered
     print("K: returning total keys entered as", keysEntered)
     thesekeys = keysEntered
     reset_keys_entered()

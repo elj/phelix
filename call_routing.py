@@ -15,7 +15,8 @@ initial_digits = 5     # default number of digits to check for when starting up
 def dial_tone():
     print("USER: Starting dial tone and listening for digits")
     main_extensions = {"18007": story_list,
-                       "18002": calling_card
+                       "18002": calling_card,
+                       "0":     story_list
                        # "18003": debug
                        }
     phonesound.play_dial_tone()
@@ -156,7 +157,7 @@ def play_requested_msg(num):
 ### Do this after playing a requested message
 def post_listen_msg(num):
     global post_msg_options_ext
-    print("USER: Do you want to 1-save, 2-delete, 3-listen again, or 4-rerecord?")
+    print("USER: Do you want to 1-listen, 2-save, 3-delete, or 4-rerecord?")
     phonesound.play_ext_msg("post_rec")
     ext_options = post_msg_options_ext
     modes.allow_dialing()
@@ -208,6 +209,11 @@ def post_rec_msg(num):
 def save_msg(num):
     print("USER: Saving message to list. To hear it again, call back and enter", num)
     phonesound.play_ext_msg("vm_saved")
+    while phonesound.is_voice_playing():
+        if modes.on_hook():
+            return
+        time.sleep(0.1)
+    phonesound.play_disconnect()
     while phonesound.is_voice_playing():
         if modes.on_hook():
             return

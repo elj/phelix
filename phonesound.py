@@ -67,6 +67,9 @@ def wait_for_playback(ch):
         if modes.get_mode() == 0:
             return 0
         time.sleep(0.05)
+
+def play_disconnect():
+    voice.play(disconnect, -1)
     
 def process_hangup():
     pygame.mixer.stop()
