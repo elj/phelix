@@ -5,6 +5,7 @@ import pygame
 import os
 import sys
 import time
+import phone_modes as modes
 
 # set number of desired asynchronous channels (referenced later in mixer setup)
 number_of_channels = 8
@@ -18,13 +19,6 @@ vm_files = {}
 ### end custom variables ###
     
 ### functions and stuff go here ###
-def load_and_play_vm(num):
-    print("loading VM files as sounds")
-    ## TODO: actually load the files
-    vm_filename = num + ".wav"
-    vm_sound = pygame.mixer.Sound(os.path.join(current_folder, 'recordings', vm_filename))
-    vm.play(vm_sound)
-
 
 def play_dial_tone():
     dialtone.stop()
@@ -32,16 +26,6 @@ def play_dial_tone():
     
 def stop_dial_tone():
     dialtone.fadeout(10)
-    
-def play_welcome_message():  #play immediately after picking up the phone, instead of a dial tone
-    print("playing welcome message")
-#     welcome_msg.stop()
-#     time.sleep(0.3)
-#     welcome_msg.play(-1)
-    welcome_msg.play(-1)
-    
-def stop_welcome_message():
-    welcome_msg.fadeout(10)
 
 def set_key_audio(k, desired_state):
     if key_tones.get(k, 0) == 0:
@@ -55,25 +39,57 @@ def set_key_audio(k, desired_state):
 def play_ext_msg(sound_name):  #replace for CallingCard
     sound = ext_audio[sound_name]
     voice.play(sound)
+
+def play_ringing_vm_intro(num):
+    voice.play(vm_ring)
+    for n in num:
+        print(n)
+    wait_for_playback(voice)
+    voice.play(vm_0)
+    wait_for_playback(voice)
+    voice.play(vm_na)
+    wait_for_playback(voice)
+
+def load_and_play_rec(num):
+    print("loading VM files as sounds")
+    ## TODO: actually load the files
+    rec_filename = num + ".wav"
+    rec_sound = pygame.mixer.Sound(os.path.join(current_folder, 'recordings', rec_filename))
+    rec.play(rec_sound)
+
+def wait_for_playback(ch):
+    while ch.get_busy():
+        if modes.get_mode() == 0:
+            return
+        time.sleep(0.05)
     
 def process_hangup():
     pygame.mixer.stop()
     
 def play_waymark():
     waymark.play()
-    
+
+def is_voice_playing():
+    return voice.get_busy()
+
+def is_rec_playing():
+    return rec.get_busy()
+
+def play_welcome_message():  #play immediately after picking up the phone, instead of a dial tone
+    print("playing welcome message")
+#     welcome_msg.stop()
+#     time.sleep(0.3)
+#     welcome_msg.play(-1)
+    welcome_msg.play(-1)
+
+def stop_welcome_message():
+    welcome_msg.fadeout(10)
+
 def is_welcome_playing():
     if welcome_msg.get_num_channels() > 0:
         return True
     else:
         return False
-
-def is_voice_playing():
-    return voice.get_busy()
-
-def is_vm_playing():
-    return vm.get_busy()
-
 
 ### end functions ###
 
@@ -86,7 +102,7 @@ pygame.mixer.set_num_channels(number_of_channels)  # must come *after* .init
 c1 = pygame.mixer.Channel(1)
 keys = pygame.mixer.Channel(0)
 voice = pygame.mixer.Channel(2)
-vm = pygame.mixer.Channel(3)
+rec = pygame.mixer.Channel(3)
 #c1.set_volume(0.1, 0.9)
 
 # Temp voice files
@@ -143,14 +159,26 @@ keypounds = pygame.mixer.Sound(os.path.join(current_folder, 'sounds', 'DTMF-poun
 
 dialtone = pygame.mixer.Sound(os.path.join(current_folder, 'sounds', 'dialtone.wav'))
 beep = pygame.mixer.Sound(os.path.join(current_folder, 'sounds', 'keytone4.wav'))
+busy_signal = pygame.mixer.Sound(os.path.join(current_folder, 'sounds', 'busy_tone_loop.wav'))
+disconnect = pygame.mixer.Sound(os.path.join(current_folder, 'sounds', 'disconnect_tones.wav'))
+
 test_voicemail = pygame.mixer.Sound(os.path.join(current_folder, 'sounds', 'test_voicemail.wav'))
 
-vm_ext1 = pygame.mixer.Sound(os.path.join(current_folder, 'sounds', 'vm_ext1.wav'))
-vm_ext2 = pygame.mixer.Sound(os.path.join(current_folder, 'sounds', 'vm_ext2.wav'))
-vm_ext3 = pygame.mixer.Sound(os.path.join(current_folder, 'sounds', 'vm_ext3.wav'))
-vm_ext4 = pygame.mixer.Sound(os.path.join(current_folder, 'sounds', 'vm_ext4.wav'))
-vm_ext5 = pygame.mixer.Sound(os.path.join(current_folder, 'sounds', 'vm_ext5.wav'))
-vm_ext7 = pygame.mixer.Sound(os.path.join(current_folder, 'sounds', 'vm_ext7.wav'))
+vm_0 = pygame.mixer.Sound(os.path.join(current_folder, 'sounds', 'vm_0.wav'))
+vm_1 = pygame.mixer.Sound(os.path.join(current_folder, 'sounds', 'vm_1.wav'))
+vm_2 = pygame.mixer.Sound(os.path.join(current_folder, 'sounds', 'vm_2.wav'))
+vm_3 = pygame.mixer.Sound(os.path.join(current_folder, 'sounds', 'vm_3.wav'))
+vm_4 = pygame.mixer.Sound(os.path.join(current_folder, 'sounds', 'vm_4.wav'))
+vm_5 = pygame.mixer.Sound(os.path.join(current_folder, 'sounds', 'vm_5.wav'))
+vm_6 = pygame.mixer.Sound(os.path.join(current_folder, 'sounds', 'vm_6.wav'))
+vm_7 = pygame.mixer.Sound(os.path.join(current_folder, 'sounds', 'vm_7.wav'))
+vm_8 = pygame.mixer.Sound(os.path.join(current_folder, 'sounds', 'vm_8.wav'))
+vm_9 = pygame.mixer.Sound(os.path.join(current_folder, 'sounds', 'vm_9.wav'))
+
+vm_ring = pygame.mixer.Sound(os.path.join(current_folder, 'sounds', 'ringing_answer.wav'))
+vm_na = pygame.mixer.Sound(os.path.join(current_folder, 'sounds', 'vm_is_not_available.wav'))
+
+vm_not_found = pygame.mixer.Sound(os.path.join(current_folder, 'sounds', 'vm_not_a_working_number.wav'))
 
 waymark = pygame.mixer.Sound(os.path.join(current_folder, 'sounds', 'waymark_explorb.wav'))
 

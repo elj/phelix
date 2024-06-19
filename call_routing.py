@@ -146,9 +146,9 @@ def play_requested_msg(num):
     while phonesound.is_voice_playing():
         if modes.on_hook():
             return
-    phonesound.load_and_play_vm(num)
+    phonesound.load_and_play_rec(num)
     print("USER: Playing message")
-    while phonesound.is_vm_playing():
+    while phonesound.is_rec_playing():
         if modes.on_hook():
             return
     post_listen_msg(num)
@@ -171,9 +171,9 @@ def post_listen_msg(num):
 ### Do all the recording stuff in voicemail
 def record_msg(num):
     print("USER: Playing voicemail message...")
-    phonesound.play_ext_msg("reached")
-    while phonesound.is_voice_playing():
-        time.sleep(0.1)
+    phonesound.play_ringing_vm_intro(num)
+    #while phonesound.is_voice_playing():
+    #    time.sleep(0.1)
     print("USER: Recording test message, press any key when done")
     modes.allow_dialing()
     vm.start_recording(num)
