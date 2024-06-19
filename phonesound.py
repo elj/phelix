@@ -42,13 +42,18 @@ def play_ext_msg(sound_name):  #replace for CallingCard
 
 def play_ringing_vm_intro(num):
     voice.play(vm_ring)
+    number_sounds = []
     for n in num:
-        print(n)
-    wait_for_playback(voice)
-    voice.play(vm_0)
-    wait_for_playback(voice)
+        number_sounds.append(vm_nums[int(n)])        
+    if wait_for_playback(voice) == 0:
+        return 0
+    for n in number_sounds:
+        voice.play(n)
+        if wait_for_playback(voice) == 0:
+            return
     voice.play(vm_na)
-    wait_for_playback(voice)
+    if wait_for_playback(voice) == 0:
+        return 0
 
 def load_and_play_rec(num):
     print("loading VM files as sounds")
@@ -60,7 +65,7 @@ def load_and_play_rec(num):
 def wait_for_playback(ch):
     while ch.get_busy():
         if modes.get_mode() == 0:
-            return
+            return 0
         time.sleep(0.05)
     
 def process_hangup():
@@ -174,6 +179,8 @@ vm_6 = pygame.mixer.Sound(os.path.join(current_folder, 'sounds', 'vm_6.wav'))
 vm_7 = pygame.mixer.Sound(os.path.join(current_folder, 'sounds', 'vm_7.wav'))
 vm_8 = pygame.mixer.Sound(os.path.join(current_folder, 'sounds', 'vm_8.wav'))
 vm_9 = pygame.mixer.Sound(os.path.join(current_folder, 'sounds', 'vm_9.wav'))
+
+vm_nums = [vm_0, vm_1, vm_2, vm_3, vm_4, vm_5, vm_6, vm_7, vm_8, vm_9]
 
 vm_ring = pygame.mixer.Sound(os.path.join(current_folder, 'sounds', 'ringing_answer.wav'))
 vm_na = pygame.mixer.Sound(os.path.join(current_folder, 'sounds', 'vm_is_not_available.wav'))

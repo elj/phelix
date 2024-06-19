@@ -171,13 +171,17 @@ def post_listen_msg(num):
 ### Do all the recording stuff in voicemail
 def record_msg(num):
     print("USER: Playing voicemail message...")
-    phonesound.play_ringing_vm_intro(num)
+    modes.prevent_dialing()
+    if phonesound.play_ringing_vm_intro(num) == 0:
+        return
     #while phonesound.is_voice_playing():
     #    time.sleep(0.1)
     print("USER: Recording test message, press any key when done")
     modes.allow_dialing()
     vm.start_recording(num)
     print("CR: Done with recording stuff, moving on")
+    if modes.on_hook():
+        return
     modes.prevent_dialing()
     post_rec_msg(num)
 
