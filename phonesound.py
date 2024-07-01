@@ -9,6 +9,7 @@ import phone_modes as modes
 
 # set number of desired asynchronous channels (referenced later in mixer setup)
 number_of_channels = 8
+#pygame.print_debug_info()
 
 # look for sound & music files in subfolder 'data'
 #pygame.mixer.music.load(os.path.join('data', 'loophole.wav'))#load music
@@ -50,7 +51,7 @@ def play_ringing_vm_intro(num):
     for n in number_sounds:
         voice.play(n)
         if wait_for_playback(voice) == 0:
-            return
+            return 0
     voice.play(vm_na)
     if wait_for_playback(voice) == 0:
         return 0
@@ -60,6 +61,7 @@ def load_and_play_rec(num):
     ## TODO: actually load the files
     rec_filename = num + ".wav"
     rec_sound = pygame.mixer.Sound(os.path.join(current_folder, 'recordings', rec_filename))
+    rec.set_source_location(0, 128)
     rec.play(rec_sound)
 
 def wait_for_playback(ch):
@@ -70,6 +72,12 @@ def wait_for_playback(ch):
 
 def play_disconnect():
     voice.play(disconnect, -1)
+
+def play_disconnect_with_dial():
+    voice.play(disconnect)
+    while voice.get_busy():
+        time.sleep(0.1)
+    voice.play(dialtone, -1)
     
 def process_hangup():
     pygame.mixer.stop()
@@ -100,8 +108,9 @@ def is_welcome_playing():
         return False
 
 ### end functions ###
+outputs = 4 # Set to 2 by default unless using 4-channel stuff
 
-pygame.mixer.pre_init(44100, -16, 6, 4096) # setup mixer to avoid sound lag
+pygame.mixer.pre_init(44100, -16, outputs, 4096) # setup mixer to avoid sound lag
 
 pygame.init()    #initialize pygame - this is where terrible things happen
 pygame.mixer.set_num_channels(number_of_channels)  # must come *after* .init
@@ -116,7 +125,7 @@ rec = pygame.mixer.Channel(3)
 # Temp voice files
 main_cc = pygame.mixer.Sound(os.path.join(current_folder, 'sounds', 'CallingCard.wav'))
 main_phelix = pygame.mixer.Sound(os.path.join(current_folder, 'sounds', 'MainNumber.wav'))
-story1 = pygame.mixer.Sound(os.path.join(current_folder, 'sounds', 'Story1.wav'))
+story1 = pygame.mixer.Sound(os.path.join(current_folder, 'sounds', 'Story1test.wav'))
 story2 = pygame.mixer.Sound(os.path.join(current_folder, 'sounds', 'Story2.wav'))
 story3 = pygame.mixer.Sound(os.path.join(current_folder, 'sounds', 'Story3.wav'))
 story4 = pygame.mixer.Sound(os.path.join(current_folder, 'sounds', 'Story4.wav'))
@@ -130,6 +139,11 @@ vm_saved = pygame.mixer.Sound(os.path.join(current_folder, 'sounds', 'Saved.wav'
 vm_deleted = pygame.mixer.Sound(os.path.join(current_folder, 'sounds', 'Deleted.wav'))
 reached = pygame.mixer.Sound(os.path.join(current_folder, 'sounds', 'Reached.wav'))
 
+# Error for number not found
+vm_not_found = pygame.mixer.Sound(os.path.join(current_folder, 'sounds', 'vm_not_a_working_number.wav'))
+
+story_test = pygame.mixer.Sound(os.path.join(current_folder, 'sounds', '4-channel-test.wav'))
+
 
 ext_audio = {
     "main_cc": main_cc,
@@ -138,6 +152,7 @@ ext_audio = {
     "story2": story2,
     "story3": story3,
     "story4": story4,
+    "story_test": story_test,
     "post_story": post_story,
     "enter_num": enter_num,
     "retrieve_msg": retrieve_msg,
@@ -147,7 +162,8 @@ ext_audio = {
     "vm_saved": vm_saved,
     "vm_deleted": vm_deleted,
     "reached": reached,
-    "vm_intro": reached
+    "vm_intro": reached,
+    "vm_not_found": vm_not_found
     }
 
 
@@ -165,13 +181,13 @@ keystars = pygame.mixer.Sound(os.path.join(current_folder, 'sounds', 'DTMF-star.
 key0s = pygame.mixer.Sound(os.path.join(current_folder, 'sounds', 'DTMF-0.wav'))  #load sound
 keypounds = pygame.mixer.Sound(os.path.join(current_folder, 'sounds', 'DTMF-pound.wav'))  #load sound
 
+# Other utility sounds
 dialtone = pygame.mixer.Sound(os.path.join(current_folder, 'sounds', 'dialtone.wav'))
 beep = pygame.mixer.Sound(os.path.join(current_folder, 'sounds', 'keytone4.wav'))
 busy_signal = pygame.mixer.Sound(os.path.join(current_folder, 'sounds', 'busy_tone_loop.wav'))
 disconnect = pygame.mixer.Sound(os.path.join(current_folder, 'sounds', 'disconnect_tones.wav'))
 
-test_voicemail = pygame.mixer.Sound(os.path.join(current_folder, 'sounds', 'test_voicemail.wav'))
-
+# Numbers spoken by the voicemail lady
 vm_0 = pygame.mixer.Sound(os.path.join(current_folder, 'sounds', 'vm_0.wav'))
 vm_1 = pygame.mixer.Sound(os.path.join(current_folder, 'sounds', 'vm_1.wav'))
 vm_2 = pygame.mixer.Sound(os.path.join(current_folder, 'sounds', 'vm_2.wav'))
@@ -185,14 +201,15 @@ vm_9 = pygame.mixer.Sound(os.path.join(current_folder, 'sounds', 'vm_9.wav'))
 
 vm_nums = [vm_0, vm_1, vm_2, vm_3, vm_4, vm_5, vm_6, vm_7, vm_8, vm_9]
 
+# Simulate calling a number to leave a voicemail
 vm_ring = pygame.mixer.Sound(os.path.join(current_folder, 'sounds', 'ringing_answer.wav'))
 vm_na = pygame.mixer.Sound(os.path.join(current_folder, 'sounds', 'vm_is_not_available.wav'))
 
-vm_not_found = pygame.mixer.Sound(os.path.join(current_folder, 'sounds', 'vm_not_a_working_number.wav'))
 
+# Test sounds
 waymark = pygame.mixer.Sound(os.path.join(current_folder, 'sounds', 'waymark_explorb.wav'))
-
 welcome_msg = pygame.mixer.Sound(os.path.join(current_folder, 'sounds', '6-channel44.wav'))
+test_voicemail = pygame.mixer.Sound(os.path.join(current_folder, 'sounds', 'test_voicemail.wav'))
 
 dialtone.set_volume(0.3)
 

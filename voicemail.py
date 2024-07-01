@@ -24,7 +24,7 @@ print("VM: recording base folder = ", current_folder)
 def read_initial_vm_files():
     global voicemail_nums
     files = os.listdir(os.path.join(current_folder, "recordings"))
-    print("Recordings", files)
+    #print("Recordings", files)
     for f in files:
         voicemail_nums.append(f.split(".")[0])
     print("Initial VM numbers:")

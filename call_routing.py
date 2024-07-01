@@ -7,26 +7,28 @@ import phone_modes as modes
 import keypad
 import voicemail as vm
 
-initial_digits = 5     # default number of digits to check for when starting up
+initial_digits = 7     # default number of digits to check for when starting up
 
 
 ### Functions for logic at each phone branch ##
 
 def dial_tone():
     print("USER: Starting dial tone and listening for digits")
-    main_extensions = {"18007": story_list,
-                       "18002": calling_card,
+    main_extensions = {"7777777": story_list,
+                       "4743549": calling_card,
                        "0":     story_list
                        # "18003": debug
                        }
     phonesound.play_dial_tone()
     modes.allow_dialing()
     dialed = ''
-    while dialed not in main_extensions: ### FIGURE OUT LOOP HERE - collect sets of digits until an extension match is found
+    while dialed not in main_extensions: 
         dialed = keypad.accept_keypad_entry_loop(initial_digits)
         if modes.on_hook():
             return
-        #time.sleep(0.05)
+        if dialed not in main_extensions:
+            print("Not a valid number!") # TODO: Do something to indicate bad number dialed
+            phonesound.play_disconnect_with_dial()
     modes.prevent_dialing()
     main_extensions[dialed]()
     print("CR: Ending main dial tone")
@@ -83,13 +85,22 @@ def post_story():
 
 ### CALLING CARD FUNCTIONS ###
 
-def calling_card():
+def calling_card(intro="yes"):
     print("USER: Do you want to 1-leave a message or 2-hear a message?")
-    phonesound.play_ext_msg("main_cc")
-    cc_ext = {"1": enter_num_to_leave_msg,
-              "2": retrieve_msg
-             }
+    # ~ if intro == "yes":
+        # ~ phonesound.play_ext_msg("main_cc")  # TODO: swap this with just the intro sound
+        # ~ while phonesound.is_voice_playing():
+            # ~ if modes.on_hook():
+                # ~ return
     modes.allow_dialing()
+    phonesound.play_ext_msg("main_cc")  # TODO: swap this with just the instructions
+    while phonesound.is_voice_playing():
+        if modes.on_hook():
+            return
+    cc_ext = {"1": enter_num_to_leave_msg,
+              "2": retrieve_msg,
+              "3": story_list
+             }
     dialed = ''
     while dialed not in cc_ext:
         dialed = keypad.accept_keypad_entry_loop(1)
@@ -113,6 +124,12 @@ def enter_num_to_leave_msg():
             return
         if dialed in vm.voicemail_nums:
             print("USER: Sorry, try a different number")
+            modes.prevent_dialing()
+            phonesound.play_ext_msg(vm_not_found)
+            while phonesound.is_voice_playing():
+                if modes.on_hook():
+                    return
+            calling_card()
         else:
             resolved = True
     modes.prevent_dialing()
@@ -128,7 +145,12 @@ def retrieve_msg():
         if modes.on_hook():
             return
         elif dialed not in vm.voicemail_nums:
+            phonesound.play_ext_msg("no_msg")  
             print("USER: Message not found at that number, try again")
+            while phonesound.is_voice_playing():
+                if modes.on_hook():
+                    return
+            calling_card()
     modes.prevent_dialing()
     play_requested_msg(dialed)
 
@@ -174,6 +196,7 @@ def record_msg(num):
     print("USER: Playing voicemail message...")
     modes.prevent_dialing()
     if phonesound.play_ringing_vm_intro(num) == 0:
+        print("CR: Play ringing returned 0")
         return
     #while phonesound.is_voice_playing():
     #    time.sleep(0.1)
