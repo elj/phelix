@@ -77,7 +77,6 @@ def key_pressed(key):
         set_whether_any_key_pressed(1)
         #print(key, "pressed")
         phonesound.stop_dial_tone() 	# stop the dial tone or welcome message if any key is pressed
-        phonesound.stop_welcome_message()	# TODO: maybe make a global stop for anything that isn't a key sound?
         phonesound.set_key_audio(key, 1)
     
 def key_unpressed(key):

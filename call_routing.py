@@ -15,7 +15,8 @@ initial_digits = 7     # default number of digits to check for when starting up
 def dial_tone():
     print("USER: Starting dial tone and listening for digits")
     main_extensions = {"7777777": story_list,
-                       "4743549": calling_card,
+                       "4743549": phelix_main_menu,
+                       "9999999": record_test,
                        "0":     story_list
                        # "18003": debug
                        }
@@ -85,21 +86,22 @@ def post_story():
 
 ### CALLING CARD FUNCTIONS ###
 
-def calling_card(intro="yes"):
-    print("USER: Do you want to 1-leave a message or 2-hear a message?")
-    # ~ if intro == "yes":
-        # ~ phonesound.play_ext_msg("main_cc")  # TODO: swap this with just the intro sound
-        # ~ while phonesound.is_voice_playing():
-            # ~ if modes.on_hook():
-                # ~ return
+def phelix_main_menu(intro="no"):
+    print("USER: Do you want to 1-leave a message, 2-hear a message, 3-hear a story?")
+    if intro == "yes":
+        phonesound.play_sound_on_voice(phonesound.phelix_intro)  # TODO: swap this with just the intro sound
+        while phonesound.is_voice_playing():
+            if modes.on_hook():
+                return
     modes.allow_dialing()
-    phonesound.play_ext_msg("main_cc")  # TODO: swap this with just the instructions
-    while phonesound.is_voice_playing():
-        if modes.on_hook():
-            return
+    phonesound.play_sound_on_voice(phonesound.ccmm)  # TODO: swap this with just the instructions
+    # ~ while phonesound.is_voice_playing():
+        # ~ if modes.on_hook():
+            # ~ return
     cc_ext = {"1": enter_num_to_leave_msg,
               "2": retrieve_msg,
-              "3": story_list
+              "3": story_list,
+              "9": record_test
              }
     dialed = ''
     while dialed not in cc_ext:
@@ -125,11 +127,11 @@ def enter_num_to_leave_msg():
         if dialed in vm.voicemail_nums:
             print("USER: Sorry, try a different number")
             modes.prevent_dialing()
-            phonesound.play_ext_msg(vm_not_found)
+            phonesound.play_sound_on_voice(phonesound.num_taken)
             while phonesound.is_voice_playing():
                 if modes.on_hook():
                     return
-            calling_card()
+            phelix_main_menu()
         else:
             resolved = True
     modes.prevent_dialing()
@@ -150,7 +152,7 @@ def retrieve_msg():
             while phonesound.is_voice_playing():
                 if modes.on_hook():
                     return
-            calling_card()
+            phelix_main_menu()
     modes.prevent_dialing()
     play_requested_msg(dialed)
 
@@ -208,6 +210,14 @@ def record_msg(num):
         return
     modes.prevent_dialing()
     post_rec_msg(num)
+
+def record_test():
+    print("Test recording...")
+    phonesound.process_hangup()
+    vm.start_recording("test_record")
+    if modes.on_hook():
+        return
+    
 
 ### Post-recording, always do this
 def post_rec_msg(num):
