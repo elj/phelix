@@ -17,14 +17,14 @@ def dial_tone():
     main_extensions = {"7777777": story_list,
                        "4743549": phelix_main_menu,
                        "9999999": record_test,
-                       "0":     story_list
-                       # "18003": debug
+                       "0":     phelix_main_menu,
+                       "1833284": phelix_debug
                        }
     phonesound.play_dial_tone()
     modes.allow_dialing()
     dialed = ''
     while dialed not in main_extensions: 
-        dialed = keypad.accept_keypad_entry_loop(initial_digits)
+        dialed = keypad.accept_keypad_entry_loop(initial_digits, True)
         if modes.on_hook():
             return
         if dialed not in main_extensions:
@@ -34,6 +34,24 @@ def dial_tone():
     main_extensions[dialed]()
     print("CR: Ending main dial tone")
     call_reset()
+
+def phelix_debug():
+    print("Enter the number to manage")
+    modes.allow_dialing()
+    dialed = ''
+    while dialed not in vm.voicemail_nums:
+        dialed = keypad.accept_keypad_entry_loop(7)
+        if modes.on_hook():
+            return
+        elif dialed not in vm.voicemail_nums:
+            phonesound.play_ext_msg("no_msg")  
+            print("USER: Message not found at that number, try again")
+            while phonesound.is_voice_playing():
+                if modes.on_hook():
+                    return
+            phelix_debug()
+    modes.prevent_dialing()
+    post_listen_msg(dialed)
 
 def call_reset():
     modes.set_mode_by_number(0)
@@ -45,7 +63,7 @@ def call_reset():
 
 def story_list():
     # play the story options list
-    phonesound.play_ext_msg("main_phelix")
+    phonesound.play_sound_on_voice(phonesound.echo_menu)
     story_ext = {"1": play_story,
                  "2": play_story,
                  "3": play_story,
@@ -65,8 +83,7 @@ def story_list():
     
 def play_story(story_num):
     print("USER: Playing story", story_num)
-    story_sound = "story" + story_num
-    phonesound.play_ext_msg(story_sound)
+    phonesound.play_story_and_outro(story_num)
     mid_story_ext = {"0": story_list,
                      "1": enter_num_to_leave_msg,
                      "2": post_story
@@ -131,7 +148,7 @@ def enter_num_to_leave_msg():
             while phonesound.is_voice_playing():
                 if modes.on_hook():
                     return
-            phelix_main_menu()
+            enter_num_to_leave_msg()
         else:
             resolved = True
     modes.prevent_dialing()
@@ -164,9 +181,9 @@ def play_requested_msg(num):
     print("USER: Attempting to play the message", num)
     if num in vm.voicemail_nums:
         print("CR: number found")
-        time.sleep(0.1)
+        time.sleep(0.2)
     # TODO: actually play the message here
-    phonesound.play_ext_msg("vm_intro")
+    phonesound.play_sound_on_voice(phonesound.beep)
     print("CR: Playing VM intro")
     while phonesound.is_voice_playing():
         if modes.on_hook():

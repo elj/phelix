@@ -25,7 +25,7 @@ lines = [line1, line2, line3, line4]
 
 keysEntered = ""    # Track the set of keys entered, as a string
 
-def accept_keypad_entry_loop(d):
+def accept_keypad_entry_loop(d, op=False):
     ### collect keys entered until the desired number of keys have been entered
     ### stop if phone hangs up / mode 0
     #print("K: starting keypad loop with", d, "digits")
@@ -37,9 +37,10 @@ def accept_keypad_entry_loop(d):
             detectKeys()     # cycle through all GPIO outputs once
         else:   # if phone is on the hook or dialing not allowed
             return
-        if keysEntered == "0":
-            print("Operator dialed")
-            return keysEntered
+        if op is True:
+            if keysEntered == "0":
+                print("Operator dialed")
+                return keysEntered
     print("K: returning total keys entered as", keysEntered)
     thesekeys = keysEntered
     reset_keys_entered()
@@ -76,7 +77,7 @@ def key_pressed(key):
     else:
         set_whether_any_key_pressed(1)
         #print(key, "pressed")
-        phonesound.stop_dial_tone() 	# stop the dial tone or welcome message if any key is pressed
+        phonesound.stop_all() 	# stop the dial tone or welcome message if any key is pressed
         phonesound.set_key_audio(key, 1)
     
 def key_unpressed(key):

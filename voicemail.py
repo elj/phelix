@@ -59,7 +59,8 @@ def start_recording(num):
                 print("Phone hung up, stopping recording")
                 # Stop recording, delete voicemail, call has ended
                 recfile.stop_recording()
-                delete_voicemail(num)
+                add_num_to_vm_list(num)
+                #delete_voicemail(num)
                 return
 
             if dialed != '':

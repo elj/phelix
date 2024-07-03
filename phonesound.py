@@ -44,6 +44,10 @@ def play_ext_msg(sound_name):  #replace for CallingCard
 def play_sound_on_voice(sound):
     voice.play(sound)
 
+def play_story_and_outro(story_num):
+    voice.play(stories[story_num])
+    voice.queue(post_story)
+
 def play_ringing_vm_intro(num):
     voice.play(vm_ring)
     number_sounds = []
@@ -84,9 +88,9 @@ def play_disconnect_with_dial():
     
 def process_hangup():
     pygame.mixer.stop()
-    
-def play_waymark():
-    waymark.play()
+
+def stop_all():
+    pygame.mixer.stop()
 
 def is_voice_playing():
     return voice.get_busy()
@@ -130,15 +134,16 @@ rec = pygame.mixer.Channel(3)
 main_cc = pygame.mixer.Sound(os.path.join(current_folder, 'sounds', 'CallingCard.wav'))
 ccmm = pygame.mixer.Sound(os.path.join(current_folder, 'sounds', 'CCMM.wav'))
 phelix_intro = pygame.mixer.Sound(os.path.join(current_folder, 'sounds', '4-Phelix.wav'))
-story1 = pygame.mixer.Sound(os.path.join(current_folder, 'sounds', 'Story1test.wav'))
+echo_menu = pygame.mixer.Sound(os.path.join(current_folder, 'sounds', 'echo_menu.wav'))
+story1 = pygame.mixer.Sound(os.path.join(current_folder, 'sounds', 'Story1.wav'))
 story2 = pygame.mixer.Sound(os.path.join(current_folder, 'sounds', 'Story2.wav'))
 story3 = pygame.mixer.Sound(os.path.join(current_folder, 'sounds', 'Story3.wav'))
 story4 = pygame.mixer.Sound(os.path.join(current_folder, 'sounds', 'Story4.wav'))
-post_story = pygame.mixer.Sound(os.path.join(current_folder, 'sounds', 'LeaveMessage.wav'))
+post_story = pygame.mixer.Sound(os.path.join(current_folder, 'sounds', 'Post_story.wav'))
 enter_num = pygame.mixer.Sound(os.path.join(current_folder, 'sounds', 'EnteringMessage.wav'))
 retrieve_msg = pygame.mixer.Sound(os.path.join(current_folder, 'sounds', 'Retrieval.wav'))
 num_taken = pygame.mixer.Sound(os.path.join(current_folder, 'sounds', 'Already_Taken.wav'))
-no_msg = pygame.mixer.Sound(os.path.join(current_folder, 'sounds', 'NoMessage.wav'))
+no_msg = pygame.mixer.Sound(os.path.join(current_folder, 'sounds', 'no_messages.wav'))
 post_rec = pygame.mixer.Sound(os.path.join(current_folder, 'sounds', 'EndRecording.wav'))
 post_listen = pygame.mixer.Sound(os.path.join(current_folder, 'sounds', 'EndRecording.wav'))
 vm_saved = pygame.mixer.Sound(os.path.join(current_folder, 'sounds', 'Saved.wav'))
@@ -150,10 +155,7 @@ vm_not_found = pygame.mixer.Sound(os.path.join(current_folder, 'sounds', 'vm_not
 
 ext_audio = {
     "main_cc": main_cc,
-    "story1": story1,
-    "story2": story2,
-    "story3": story3,
-    "story4": story4,
+
     "post_story": post_story,
     "enter_num": enter_num,
     "retrieve_msg": retrieve_msg,
@@ -167,6 +169,13 @@ ext_audio = {
     "vm_intro": reached,
     "vm_not_found": vm_not_found
     }
+
+stories = {
+    "1": story1,
+    "2": story2,
+    "3": story3,
+    "4": story4
+}
 
 
 # Key dialing tones
